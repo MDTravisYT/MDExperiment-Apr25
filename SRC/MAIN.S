@@ -77,6 +77,13 @@ init:
 	move.l	HSCROLL,	(VDPDATA)
 	dbf		d0,	.hscroll
 	
+	MOVE.L	#$40000010,	(VDPCTRL)	;	VSRAMWRITE 0000
+	add.w	#1,	VSCROLL
+	move.l	#($50/4)-1, d0
+.vscroll:
+	move.l	VSCROLL,	(VDPDATA)
+	dbf		d0,	.vscroll
+	
 	bra.s	.loop
 	
 ASCIITXT1:	dc.b	'WHY DO THEY CALL IT OVEN WHEN YOU OF'
