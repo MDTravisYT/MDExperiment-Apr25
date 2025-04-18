@@ -23,7 +23,7 @@ init:
 	move.w	#$8800+%00000000,(VDPCTRL)      ;	MASTER SYSTEM H-SCROLL
 	move.w	#$8900+%00000000,(VDPCTRL)      ;	MASTER SYSTEM V-SCROLL
 	move.w	#$8A00+%00000000,(VDPCTRL)      ;	H-INT COUNTER
-	move.w	#$8B00+%00000000,(VDPCTRL)      ;	MODE REGISTER 3
+	move.w	#$8B00+%00000111,(VDPCTRL)      ;	MODE REGISTER 3
 	move.w	#$8C00+%10000001,(VDPCTRL)      ;	MODE REGISTER 4
 	move.w	#$8D00+%00111111,(VDPCTRL)      ;	H-SCROLL DATA LOCATION
 	move.w	#$8E00+%00000000,(VDPCTRL)      ;	
@@ -68,6 +68,15 @@ init:
 	
 .loop:
 	jsr		VSync
+	
+	MOVE.L	#$7C000003,	(VDPCTRL)	;	VRAMWRITE FC00
+	add.w	#1,	HSCROLL
+	
+	move.l	#($380/4)-1, d0
+.hscroll:
+	move.l	HSCROLL,	(VDPDATA)
+	dbf		d0,	.hscroll
+	
 	bra.s	.loop
 	
 ASCIITXT1:	dc.b	'WHY DO THEY CALL IT OVEN WHEN YOU OF'
@@ -84,17 +93,12 @@ loadASCII2
 	dbf		d0,	.loop
 	rts
 	
-VSync:	;	code from ProjectFM
-    lea     ($C00004),a6
-.Loop1:                             ; Wait until current VBlank is over
-    move.w    (a6),d7
-    btst.l    #3,d7
-    bne.s    .Loop1
-.Loop2:                             ; Wait until next VBlank starts
-    move.w    (a6),d7
-    btst.l    #3,d7
-    beq.s    .Loop2
-    rts                             ; End of subroutine
+VSync:
+	move.b	#1,	VSWAIT
+.loop:
+	tst.b	VSWAIT
+	bne.s	.loop
+	rts
 	
 	include		"SRC/SYSTEM/JOYPAD.S"
 	include		"SRC/SINE.S"
