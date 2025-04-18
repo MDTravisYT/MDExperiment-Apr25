@@ -1,3 +1,9 @@
+;	IN
+;		d0.w (input offset)
+;	OUT
+;		d0.w (sine)
+;		d1.w (cosine)
+
 CALCSINE:
 		andi.w  #$FF,d0
 		add.w   d0,d0

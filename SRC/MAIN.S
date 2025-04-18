@@ -4,12 +4,14 @@
 	include		"src/system/error.s"
 	include		"src/system/interrupt.s"
 	include		"GEMS/sound.s"
-ascii:
-	incbin		"src/ascii.art"
-	ascii_end:
-hex:
-	incbin		"src/hex.art"
-	hex_end:
+art:
+	incbin		"art/art.unc"
+	art_end:	even
+map:
+	incbin		"art/map.map"
+pal:
+	incbin		"art/pal.pal"
+	pal_end:	even
 	
 init:
 	move.w	#$8000+%00000100,(VDPCTRL)		;	MODE REGISTER 1
@@ -35,70 +37,46 @@ init:
 	move.l	#CRAMWRITE,(VDPCTRL)
 	move.w	#$E0,VDPDATA
 	
-	lea		ascii,	a0
+	lea		art,	a0
 	lea		VDPDATA,a1
-	move.l	#(ascii_end-ascii)/4-1,	d0
-	move.l	#VRAMWRITE+$4000000,(VDPCTRL)
-.loadASCII1
+	move.l	#(art_end-art)/4-1,	d0
+	move.l	#VRAMWRITE,(VDPCTRL)
+.loadArt
 	move.l	(a0)+,(a1)
-	dbf		d0,	.loadASCII1
-	lea		hex,	a0
-	lea		VDPDATA,a1
-	move.l	#(hex_end-hex)/4-1,	d0
-	move.l	#VRAMWRITE+1,(VDPCTRL)
-.loadhex1
-	move.l	(a0)+,(a1)
-	dbf		d0,	.loadhex1
-	
-	InitTXT	ASCIITXT1,ASCIITXT1_END,1,1
-	InitTXT	ASCIITXT2,ASCIITXT2_END,1,2
-	InitTXT	ASCIITXT3,ASCIITXT3_END,1,3
+	dbf		d0,	.loadArt
 	
 	jsr		_sfxinit	;	init GEMS
 	jsr		INITJOYPADS	;	init controller
 	move	#$2300,sr
 	
 	move.l	#CRAMWRITE,(VDPCTRL)
-	move.l	#$0EEE,VDPDATA
-	move.w	#$0444,VDPDATA
+	lea		pal,	a0
+	move.l	#(pal_end-pal)/4-1,	d0
+.loadPal
+	move.l	(a0)+,(a1)
+	dbf		d0,	.loadPal
 	
 	move.l	#$2E,-(sp)
 	jsr	_gemsstartsong		; start song
 	adda.w	#4,sp
 	
+	PRINTMAP	map,PLANE_A,40,28
+	
 .loop:
 	jsr		VSync
 	
 	MOVE.L	#$7C000003,	(VDPCTRL)	;	VRAMWRITE FC00
-	add.w	#1,	HSCROLL
+	add.w	#1,	SINOFF
+	move.w	SINOFF,	d0
+	bsr.w	CALCSINE
+	move.w	d0,	HSCROLL
 	
-	move.l	#($380/4)-1, d0
+	move.l	#($380/4)-1, d2
 .hscroll:
 	move.l	HSCROLL,	(VDPDATA)
-	dbf		d0,	.hscroll
-	
-	MOVE.L	#$40000010,	(VDPCTRL)	;	VSRAMWRITE 0000
-	add.w	#1,	VSCROLL
-	move.l	#($50/4)-1, d0
-.vscroll:
-	move.l	VSCROLL,	(VDPDATA)
-	dbf		d0,	.vscroll
+	dbf		d2,	.hscroll
 	
 	bra.s	.loop
-	
-ASCIITXT1:	dc.b	'WHY DO THEY CALL IT OVEN WHEN YOU OF'
-	ASCIITXT1_END:	even
-ASCIITXT2:	dc.b	'IN THE COLD FOOD OF OUT HOT EAT THE'
-	ASCIITXT2_END:	even
-ASCIITXT3:	dc.b	'FOOD'
-	ASCIITXT3_END:	even
-
-loadASCII2
-.loop
-	move.b	(a0)+,d1
-	move.w	d1,	(a1)
-	dbf		d0,	.loop
-	rts
 	
 VSync:
 	move.b	#1,	VSWAIT
@@ -109,3 +87,4 @@ VSync:
 	
 	include		"SRC/SYSTEM/JOYPAD.S"
 	include		"SRC/SINE.S"
+	include		"SRC/DRAWTILEMAP.S"
