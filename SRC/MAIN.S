@@ -97,3 +97,4 @@ VSync:	;	code from ProjectFM
     rts                             ; End of subroutine
 	
 	include		"SRC/SYSTEM/JOYPAD.S"
+	include		"SRC/SINE.S"
