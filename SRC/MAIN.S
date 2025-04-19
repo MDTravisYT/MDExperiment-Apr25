@@ -67,12 +67,19 @@ init:
 	
 	MOVE.L	#$7C000003,	(VDPCTRL)	;	VRAMWRITE FC00
 	add.w	#1,	SINOFF
-	move.w	SINOFF,	d0
-	bsr.w	CALCSINE
-	move.w	d0,	HSCROLL
+	move.w	SINOFF,	SINOFF2
 	
 	move.l	#($380/4)-1, d2
 .hscroll:
+	add.w	#1,	SINOFF2
+	move.w	SINOFF2,	d0
+	bsr.w	CALCSINE
+	lsr.w	#4,	d0
+	btst	#0,	SINOFF2+1
+	bne.s	.cont
+	neg.w	d0
+.cont
+	move.w	d0,	HSCROLL
 	move.l	HSCROLL,	(VDPDATA)
 	dbf		d2,	.hscroll
 	

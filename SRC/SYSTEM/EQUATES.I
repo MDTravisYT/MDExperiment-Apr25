@@ -50,6 +50,7 @@ bitUp:		equ 0
 HSCROLL			rs.b	$380
 VSCROLL			rs.b	$40
 SINOFF			rs.w	1
+SINOFF2			rs.w	1
 JOYPAD			rs.b	1
 JOYPADPRESS		rs.b	1
 VSWAIT			rs.b	1
