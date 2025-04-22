@@ -19,12 +19,19 @@
 .loop:
 	jsr		VSync
 	btst	#bitR,	JOYPADPRESS
-	bne.s	.prog
+	bne.s	.progR
+	btst	#bitL,	JOYPADPRESS
+	bne.s	.progL
 	
 	bra.s	.loop
 	
-.prog
+.progR
 	add.b	#1,	XPOS
+	lea		mapset,	a1
+	bsr.w	MakeMap
+	bra.s	.loop
+.progL
+	sub.b	#1,	XPOS
 	lea		mapset,	a1
 	bsr.w	MakeMap
 	bra.s	.loop
@@ -42,6 +49,7 @@ MakeMap:
 	move.l		a1,		d1		;	can't add data register into address so gotta compromise
 	add.w		d0,		d1		;	move over map offset
 	move.l		d1,		a1		;	move back into a1 (map data)
+	and.b		#$0F,	d0		;	destroy high nybble (no wrapping!!)
 	swap		d0				;	convert to VRAM offset	(00000001 > 00010000)
 	lsl.l		#3,		d0		;	convert to VRAM offset	(00010000 > 00080000)
 	add.l		d0,		d3		;	add to VRAM offset
