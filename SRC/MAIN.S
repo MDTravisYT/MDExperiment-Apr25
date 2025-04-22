@@ -13,6 +13,9 @@
 	move.w	#$0A09,	MAPSIZE ; (X 10 Y 9)
 	bsr.w	MakeMap
 
+	move.l	#CRAMWRITE,(VDPCTRL)	;	making sure were not looping
+	move.w	#$E0,VDPDATA
+
 .loop:
 	jsr		VSync
 	
@@ -22,24 +25,44 @@
 ;	== PRINT MAP (SUB) =--===========================
 
 MakeMap:
+	WRITEVRAM	PLANE_A,d3		;	reference raw VRAM pointer
 	move.b	MAPSIZE+1,	d4	;	YMODE: Y length
 	swap	d4				;	storing both in same register
+	
+.loopX2
 	move.b	MAPSIZE,	d4	;	XMODE: X length
-	WRITEVRAM	PLANE_A,d3		;	reference raw VRAM pointer
+	
 .loopX
 	tst.b	d4				;	check if X length is used up
-	beq.s	.exit
+	beq.s	.tstY
 	bsr.s	MakeChunk
 	sub.l	#$1F80000,d3		;	move drawer to next position
 	bra.s	.loopX
 	
+.tstY
+	swap	d4				;	YMODE
+	tst.b	d4				;	YMODE
+	bne.s	.loopY
+	
 .exit
 	rts
+	
+.loopY
+	add.l	#$2000000,d3		;	move drawer to next position
+	sub.b	#1,	d4	;	YMODE
+	swap	d4		;	XMODE
+	move.b	MAPSIZE,	d4	;	XMODE: X length
+.rollbackX
+	tst.b	d4				;	check if X length is used up
+	beq.s	.loopX2
+	sub.l	#$80000,	d3
+	sub.b	#1,	d4	;	XMODE
+	bra.s	.rollbackX
 
 ;	== PRINT CHUNK (SUB) ============================
 
 MakeChunk:
-	jsr		VSync	;	TEMP
+;	jsr		VSync	;	TEMP
 	lea			blkset,	a0		;	storing reference point in a0
 	move.b		(a1)+,	d0		;	move map chunk data to d0
 	lsl.w		#4,		d0		;	multiply d0 by 16 (bytes in a chunk)
