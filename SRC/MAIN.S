@@ -20,13 +20,14 @@
 
 MakeChunk:
 	moveq		#0,		d0		;	storing tile ID in d0, clearing to remove excess garbage on high word
-	move.l		#4-1,	d1		;	horizontal timer
-	move.l		d1,		d2		;	vertical timer (same as d1)
 	WRITEVRAM	PLANE_A
+	move.l		#4-1,	d2		;	vertical timer   (v)
 	lea			blkset,	a0		;	storing reference point in a0
+	move.l		#4-1,	d1		;	horizontal timer (>)
+.loop1
 	move.b		(a0)+,	d0		;	gotta convert that byte into a word so VDP likes it!
 	move.w		d0,	VDPDATA
-	
+	dbf		d1,	.loop1
 	
 	rts
 
