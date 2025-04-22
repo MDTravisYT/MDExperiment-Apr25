@@ -75,3 +75,4 @@ VSync:
 	rts
 	
 	include		"SRC/SYSTEM/JOYPAD.S"
+	include		"SRC/DRAWTILEMAP.S"
