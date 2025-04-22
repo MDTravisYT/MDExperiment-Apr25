@@ -47,13 +47,22 @@
 ;	bra.s	.cont
 	
 .cont
+	WRITEVRAM	$FC00
+	move.b	XPOS,	d0
+	lsl.w	#5,		d0
+	neg.w	d0
+	move.w	d0,		VDPDATA
+	WRITEVSRAM	0
+	move.b	YPOS,	d0
+	lsl.w	#5,		d0
+	move.w	d0,		VDPDATA
 	bsr.w	MakeMap
-	bra.s	.loop
+	bra.w	.loop
 	
 	
 ;	== PRINT MAP (SUB) =--===========================
 
-LIMITX	=	3-1		;	12
+LIMITX	=	12-1		;	12
 LIMITY	=	8-1		;	8
 
 MakeMap:
@@ -66,8 +75,6 @@ MakeMap:
 	swap		d0				;	convert to VRAM offset	(00000001 > 00010000)
 	lsl.l		#3,		d0		;	convert to VRAM offset	(00010000 > 00080000)
 	add.l		d0,		d3		;	add to VRAM offset
-
-;	start: 1 | end: 19
 
 	moveq		#0,		d0		;	wipe d0
 	move.b		YPOS,	d0		;	grab Y position
