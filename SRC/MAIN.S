@@ -13,8 +13,8 @@
 	move.w	#$0A09,	MAPSIZE ; (X 10 Y 9)
 	bsr.w	MakeMap
 
-	move.l	#CRAMWRITE,(VDPCTRL)	;	making sure were not looping
-	move.w	#$E0,VDPDATA
+;	move.l	#CRAMWRITE,(VDPCTRL)	;	making sure were not looping
+;	move.w	#$E0,VDPDATA
 
 .loop:
 	jsr		VSync
