@@ -7,19 +7,17 @@
 	
 	include		"src/init.s"
 	
+;	== THE LESS IMPORTANT STUFF =====================
+
 .loop:
 	jsr		VSync
 	
 	bra.s	.loop
 	
-VSync:
-	move.b	#1,	VSWAIT
-.loop:
-	tst.b	VSWAIT
-	bne.s	.loop
-	rts
+;	== INCLUDES =====================================
 	
 	include		"SRC/SYSTEM/JOYPAD.S"
+	include		"SRC/SYSTEM/VSYNC.S"
 	
 art:
 	incbin		"art/art.unc"
