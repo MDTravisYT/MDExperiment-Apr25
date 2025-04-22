@@ -47,7 +47,7 @@ bitDn:		equ 1
 bitUp:		equ 0
 
 	rsset	$FF0000
-CHUNKID			rs.b	1	;	temp
+MAPSIZE			rs.w	1
 JOYPAD			rs.b	1
 JOYPADPRESS		rs.b	1
 VSWAIT			rs.b	1
