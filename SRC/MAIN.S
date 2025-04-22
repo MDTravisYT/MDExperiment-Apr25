@@ -22,24 +22,38 @@
 	bne.s	.progR
 	btst	#bitL,	JOYPADPRESS
 	bne.s	.progL
+	btst	#bitDn,	JOYPADPRESS
+	bne.s	.progD
+	btst	#bitUp,	JOYPADPRESS
+	bne.s	.progU
 	
 	bra.s	.loop
 	
 .progR
 	add.b	#1,	XPOS
 	lea		mapset,	a1
-	bsr.w	MakeMap
-	bra.s	.loop
+	bra.s	.cont
 .progL
 	sub.b	#1,	XPOS
 	lea		mapset,	a1
+	bra.s	.cont
+.progD
+	add.b	#1,	YPOS
+	lea		mapset,	a1
+	bra.s	.cont
+.progU
+	sub.b	#1,	YPOS
+	lea		mapset,	a1
+;	bra.s	.cont
+	
+.cont
 	bsr.w	MakeMap
 	bra.s	.loop
 	
 	
 ;	== PRINT MAP (SUB) =--===========================
 
-LIMITX	=	3-1	;	12
+LIMITX	=	3-1		;	12
 LIMITY	=	8-1		;	8
 
 MakeMap:
@@ -48,11 +62,27 @@ MakeMap:
 	move.b		XPOS,	d0		;	grab X position
 	move.l		a1,		d1		;	can't add data register into address so gotta compromise
 	add.w		d0,		d1		;	move over map offset
-	move.l		d1,		a1		;	move back into a1 (map data)
 	and.b		#$0F,	d0		;	destroy high nybble (no wrapping!!)
 	swap		d0				;	convert to VRAM offset	(00000001 > 00010000)
 	lsl.l		#3,		d0		;	convert to VRAM offset	(00010000 > 00080000)
 	add.l		d0,		d3		;	add to VRAM offset
+
+;	start: 1 | end: 19
+
+	moveq		#0,		d0		;	wipe d0
+	move.b		YPOS,	d0		;	grab Y position
+	moveq		#0,		d2		;	wipe d2
+	move.b		MAPSIZE,d2		;	grab map Xsize
+;;	sub.b		#1,		d0		;	for dbf (always runs one more than told)
+.loopYoff
+	add.w		d2,		d1		;	get offset for data
+	add.w		d2,		d1		;	get offset for data
+	dbf			d0,		.loopYoff
+;	illegal
+	move.l		d1,		a1		;	move back into a1 (map data)
+;	illegal
+	moveq		#0,		d0		;	wipe d0
+	
 	move.b	MAPSIZE+1,	d4	;	YMODE: Y length
 	swap	d4				;	storing both in same register
 	move.l	#(LIMITY*$10000)+LIMITX,	d5	;	Limiter so screen doesnt draw over itself when map's too big (8 down, 16 across)
