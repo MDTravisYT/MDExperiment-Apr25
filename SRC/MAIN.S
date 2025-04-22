@@ -10,7 +10,7 @@
 ;	== MAIN LOOP ====================================
 
 	lea		mapset,	a1
-	MAPSIZE	10,	9
+	MAPSIZE	20,	9
 	bsr.w	MakeMap
 
 ;	move.l	#CRAMWRITE,(VDPCTRL)	;	making sure were not looping
@@ -28,11 +28,16 @@ MakeMap:
 	WRITEVRAM	PLANE_A,d3		;	reference raw VRAM pointer
 	move.b	MAPSIZE+1,	d4	;	YMODE: Y length
 	swap	d4				;	storing both in same register
+	move.l	#$00080010,	d5	;	Limiter so screen doesnt draw over itself when map's too big
 	
 .loopX2
 	move.b	MAPSIZE,	d4	;	XMODE: X length
 	
 .loopX
+	tst.b		d5
+	beq.s	.cont
+	sub.b		#1,	d5	;	X Limiter
+.cont
 	tst.b	d4				;	check if X length is used up
 	beq.s	.tstY
 	bsr.s	MakeChunk
@@ -40,6 +45,12 @@ MakeMap:
 	bra.s	.loopX
 	
 .tstY
+	move.b	#$10,	d5	;	X Limiter
+	swap	d5			;	YLIMIT
+	sub.b	#1,		d5
+	tst.b	d5
+	beq.s	.exit
+	swap	d5			;	XLIMIT
 	swap	d4				;	YMODE
 	tst.b	d4				;	YMODE
 	bne.s	.loopY
@@ -76,11 +87,13 @@ MakeChunk:
 	move.l		#4-1,	d1		;	horizontal timer (>)
 .loop1
 	move.b		(a0)+,	d0		;	gotta convert that byte into a word so VDP likes it!
+	tst.b		d5				;	limiter
+	beq.s		.noDraw			;	don't draw if limit reached
 	move.w		d0,	VDPDATA
+.noDraw
 	dbf			d1,	.loop1		;	horizontal loop
 	add.l		#$800000,d3		;	move drawer down one
 	dbf			d2,	.loop2		;	vertical loop
-	
 	sub.b		#1,	d4			;	subtract counter from MakeMap
 	rts
 
@@ -99,5 +112,5 @@ blkset:
 	incbin		"src/overworld.bst"
 	even
 mapset:
-	incbin		"src/PalletTown.blk"
+	incbin		"src/ViridianCity.blk"
 	even
