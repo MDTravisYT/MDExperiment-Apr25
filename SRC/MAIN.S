@@ -78,6 +78,7 @@ MakeMap:
 	sub.b		#1,		d0		;	for dbf (always runs one more than told)
 .loopYoff
 	add.w		d2,		d1		;	get offset for data
+	add.l	#$2000000,d3		;	move drawer to next position
 	dbf			d0,		.loopYoff
 .skipYoff
 	move.l		d1,		a1		;	move back into a1 (map data)
@@ -116,6 +117,10 @@ MakeMap:
 	
 .loopY
 	add.l	#$2000000,d3		;	move drawer to next position
+	cmpi.l	#$50000000,d3		;	make sure we don't fall out of bounds
+	blo.s	.skipYreset
+	sub.l	#$10000000,d3
+.skipYreset
 	sub.b	#1,	d4	;	YMODE
 	swap	d4		;	XMODE
 	move.b	MAPSIZE,	d4	;	XMODE: X length
