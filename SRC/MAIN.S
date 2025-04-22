@@ -10,7 +10,7 @@
 ;	== MAIN LOOP ====================================
 
 	lea		mapset,	a1
-	move.w	#$0A09,	MAPSIZE ; (X 10 Y 9)
+	MAPSIZE	10,	9
 	bsr.w	MakeMap
 
 ;	move.l	#CRAMWRITE,(VDPCTRL)	;	making sure were not looping
@@ -23,7 +23,7 @@
 	
 	
 ;	== PRINT MAP (SUB) =--===========================
-
+;		Limit: 8 down, 16 across
 MakeMap:
 	WRITEVRAM	PLANE_A,d3		;	reference raw VRAM pointer
 	move.b	MAPSIZE+1,	d4	;	YMODE: Y length
