@@ -18,17 +18,33 @@
 
 .loop:
 	jsr		VSync
+	btst	#bitR,	JOYPADPRESS
+	bne.s	.prog
 	
+	bra.s	.loop
+	
+.prog
+	add.b	#1,	XPOS
+	lea		mapset,	a1
+	bsr.w	MakeMap
 	bra.s	.loop
 	
 	
 ;	== PRINT MAP (SUB) =--===========================
 
-LIMITX	=	12-1	;	12
+LIMITX	=	3-1	;	12
 LIMITY	=	8-1		;	8
 
 MakeMap:
 	WRITEVRAM	PLANE_A,d3		;	reference raw VRAM pointer
+	moveq		#0,		d0		;	wipe d0
+	move.b		XPOS,	d0		;	grab X position
+	move.l		a1,		d1		;	can't add data register into address so gotta compromise
+	add.w		d0,		d1		;	move over map offset
+	move.l		d1,		a1		;	move back into a1 (map data)
+	swap		d0				;	convert to VRAM offset	(00000001 > 00010000)
+	lsl.l		#3,		d0		;	convert to VRAM offset	(00010000 > 00080000)
+	add.l		d0,		d3		;	add to VRAM offset
 	move.b	MAPSIZE+1,	d4	;	YMODE: Y length
 	swap	d4				;	storing both in same register
 	move.l	#(LIMITY*$10000)+LIMITX,	d5	;	Limiter so screen doesnt draw over itself when map's too big (8 down, 16 across)
@@ -76,7 +92,6 @@ MakeMap:
 ;	== PRINT CHUNK (SUB) ============================
 
 MakeChunk:
-;	jsr		VSync	;	TEMP
 	lea			blkset,	a0		;	storing reference point in a0
 	move.b		(a1)+,	d0		;	move map chunk data to d0
 	lsl.w		#4,		d0		;	multiply d0 by 16 (bytes in a chunk)
@@ -92,6 +107,7 @@ MakeChunk:
 	move.b		(a0)+,	d0		;	gotta convert that byte into a word so VDP likes it!
 	tst.b		d5				;	limiter
 	beq.s		.noDraw			;	don't draw if limit reached
+;	jsr		VSync	;	TEMP
 	move.w		d0,	VDPDATA
 .noDraw
 	dbf			d1,	.loop1		;	horizontal loop
