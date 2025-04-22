@@ -10,7 +10,8 @@
 ;	== MAIN LOOP ====================================
 
 	lea		mapset,	a1
-	MAPSIZE	20,	19
+	MAPSIZE	20,	18
+	MAPLIMIT 10, 7
 	bsr.w	MakeMap
 
 ;	move.l	#CRAMWRITE,(VDPCTRL)	;	making sure were not looping
@@ -56,16 +57,18 @@
 	move.b	YPOS,	d0
 	lsl.w	#5,		d0
 	move.w	d0,		VDPDATA
+	MAPLIMIT 11, 8
 	bsr.w	MakeMap
 	bra.w	.loop
 	
 	
 ;	== PRINT MAP (SUB) =--===========================
 
-LIMITX	=	12-1		;	12
-LIMITY	=	8-1		;	8
+;LIMITX	=	3-1		;	12
+;LIMITY	=	2-1		;	8
 
 MakeMap:
+	move.l		d5,		d6		;	backup limiter
 	WRITEVRAM	PLANE_A,d3		;	reference raw VRAM pointer
 	moveq		#0,		d0		;	wipe d0
 	move.b		XPOS,	d0		;	grab X position
@@ -92,7 +95,7 @@ MakeMap:
 	moveq		#0,		d0		;	wipe d0
 	move.b	MAPSIZE+1,	d4	;	YMODE: Y length
 	swap	d4				;	storing both in same register
-	move.l	#(LIMITY*$10000)+LIMITX,	d5	;	Limiter so screen doesnt draw over itself when map's too big (8 down, 16 across)
+;	move.l	#(LIMITY*$10000)+LIMITX,	d5	;	Limiter so screen doesnt draw over itself when map's too big (8 down, 16 across)
 	
 .loopX2
 	move.b	MAPSIZE,	d4	;	XMODE: X length
@@ -109,7 +112,7 @@ MakeMap:
 	bra.s	.loopX
 	
 .tstY
-	move.b	#LIMITX,	d5	;	X Limiter
+	move.b	d6,		d5	;	X Limiter
 	swap	d5			;	YLIMIT
 	sub.b	#1,		d5
 	tst.b	d5
@@ -180,5 +183,5 @@ blkset:
 	incbin		"src/overworld.bst"
 	even
 mapset:
-	incbin		"src/ViridianCity.blk"
+	incbin		"src/SaffronCity.blk"
 	even
