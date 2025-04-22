@@ -10,7 +10,7 @@
 ;	== MAIN LOOP ====================================
 
 	lea		mapset,	a1
-	MAPSIZE	20,	9
+	MAPSIZE	20,	19
 	bsr.w	MakeMap
 
 ;	move.l	#CRAMWRITE,(VDPCTRL)	;	making sure were not looping
@@ -23,12 +23,15 @@
 	
 	
 ;	== PRINT MAP (SUB) =--===========================
-;		Limit: 8 down, 16 across
+
+LIMITX	=	12-1	;	12
+LIMITY	=	8-1		;	8
+
 MakeMap:
 	WRITEVRAM	PLANE_A,d3		;	reference raw VRAM pointer
 	move.b	MAPSIZE+1,	d4	;	YMODE: Y length
 	swap	d4				;	storing both in same register
-	move.l	#$00080010,	d5	;	Limiter so screen doesnt draw over itself when map's too big
+	move.l	#(LIMITY*$10000)+LIMITX,	d5	;	Limiter so screen doesnt draw over itself when map's too big (8 down, 16 across)
 	
 .loopX2
 	move.b	MAPSIZE,	d4	;	XMODE: X length
@@ -45,7 +48,7 @@ MakeMap:
 	bra.s	.loopX
 	
 .tstY
-	move.b	#$10,	d5	;	X Limiter
+	move.b	#LIMITX,	d5	;	X Limiter
 	swap	d5			;	YLIMIT
 	sub.b	#1,		d5
 	tst.b	d5
