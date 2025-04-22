@@ -71,18 +71,17 @@ MakeMap:
 
 	moveq		#0,		d0		;	wipe d0
 	move.b		YPOS,	d0		;	grab Y position
+	tst.b		d0				;	are we at the top of the map
+	beq.s		.skipYoff		;	skip if so
 	moveq		#0,		d2		;	wipe d2
 	move.b		MAPSIZE,d2		;	grab map Xsize
-;;	sub.b		#1,		d0		;	for dbf (always runs one more than told)
+	sub.b		#1,		d0		;	for dbf (always runs one more than told)
 .loopYoff
 	add.w		d2,		d1		;	get offset for data
-	add.w		d2,		d1		;	get offset for data
 	dbf			d0,		.loopYoff
-;	illegal
+.skipYoff
 	move.l		d1,		a1		;	move back into a1 (map data)
-;	illegal
 	moveq		#0,		d0		;	wipe d0
-	
 	move.b	MAPSIZE+1,	d4	;	YMODE: Y length
 	swap	d4				;	storing both in same register
 	move.l	#(LIMITY*$10000)+LIMITX,	d5	;	Limiter so screen doesnt draw over itself when map's too big (8 down, 16 across)
