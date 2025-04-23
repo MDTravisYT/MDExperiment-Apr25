@@ -40,23 +40,34 @@
 	bsr.w	MakeMap
 	bra.s	.loop
 .u
-	sub.b	#1,	SCREENY
-	lea		mapset,	a1
-	bsr.w	MakeMap
+;	sub.b	#1,	SCREENY
+;	lea		mapset,	a1
+;	bsr.w	MakeMap
 	bra.s	.loop
 .d
-	add.b	#1,	SCREENY
-	lea		mapset,	a1
-	bsr.w	MakeMap
+;	add.b	#1,	SCREENY
+;	lea		mapset,	a1
+;	bsr.w	MakeMap
 	bra.s	.loop
 
 	
 ;	== PRINT MAP (SUB) =--===========================
 
-LIMITX	=	12-1	;	12
+LIMITX	=	3-1	;	12
 LIMITY	=	8-1		;	8
 
 MakeMap:
+
+	WRITEVRAM	PLANE_A,d3		;	reference raw VRAM pointer
+	moveq	#0,			d0
+	move.b	SCREENX,	d0
+	and.b	#%00001111,		d0	;	wrap shift prevention
+	lsl.l	#8,			d0	;	goal: 20000, at 80
+	lsl.l	#8,			d0	;	goal: 20000, at 8000
+	lsl.l	#3,			d0	;	at:   20000
+	add.l	d0,			d3	;	add X offset to writer
+	moveq	#0,			d0
+	
 	moveq	#0,			d0
 	moveq	#0,			d1
 	move.b	SCREENX,	d0
@@ -68,8 +79,8 @@ MakeMap:
 	add.w	#1,			d1
 	mulu.w	d1,			d0
 	add.w	d0,			a1	;	offset map data vertically
-
-	WRITEVRAM	PLANE_A,d3		;	reference raw VRAM pointer
+	moveq	#0,			d0
+	
 	move.b	MAPSIZE+1,	d4	;	YMODE: Y length
 	swap	d4				;	storing both in same register
 	move.l	#(LIMITY*$10000)+LIMITX,	d5	;	Limiter so screen doesnt draw over itself when map's too big (8 down, 16 across)
