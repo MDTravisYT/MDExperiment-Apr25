@@ -18,9 +18,38 @@
 
 .loop:
 	jsr		VSync
+	btst	#bitL,	JOYPADPRESS
+	bne.s	.l
+	btst	#bitR,	JOYPADPRESS
+	bne.s	.r
+	btst	#bitUp,	JOYPADPRESS
+	bne.s	.u
+	btst	#bitDn,	JOYPADPRESS
+	bne.s	.d
 	
 	bra.s	.loop
-	
+
+.l
+	sub.b	#1,	SCREENX
+	lea		mapset,	a1
+	bsr.w	MakeMap
+	bra.s	.loop
+.r
+	add.b	#1,	SCREENX
+	lea		mapset,	a1
+	bsr.w	MakeMap
+	bra.s	.loop
+.u
+	sub.b	#1,	SCREENY
+	lea		mapset,	a1
+	bsr.w	MakeMap
+	bra.s	.loop
+.d
+	add.b	#1,	SCREENY
+	lea		mapset,	a1
+	bsr.w	MakeMap
+	bra.s	.loop
+
 	
 ;	== PRINT MAP (SUB) =--===========================
 
@@ -28,6 +57,18 @@ LIMITX	=	12-1	;	12
 LIMITY	=	8-1		;	8
 
 MakeMap:
+	moveq	#0,			d0
+	moveq	#0,			d1
+	move.b	SCREENX,	d0
+	add.w	d0,			a1	;	offset map data horizontally
+	
+	moveq	#0,			d1
+	move.b	SCREENY,	d0
+	move.b	MAPSIZE+1,	d1
+	add.w	#1,			d1
+	mulu.w	d1,			d0
+	add.w	d0,			a1	;	offset map data vertically
+
 	WRITEVRAM	PLANE_A,d3		;	reference raw VRAM pointer
 	move.b	MAPSIZE+1,	d4	;	YMODE: Y length
 	swap	d4				;	storing both in same register
@@ -93,6 +134,7 @@ MakeChunk:
 	tst.b		d5				;	limiter
 	beq.s		.noDraw			;	don't draw if limit reached
 	move.w		d0,	VDPDATA
+;	jsr		VSync	;	TEMP
 .noDraw
 	dbf			d1,	.loop1		;	horizontal loop
 	add.l		#$800000,d3		;	move drawer down one
