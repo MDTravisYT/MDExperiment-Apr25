@@ -11,7 +11,7 @@
 
 	lea		mapset,	a1
 	MAPSIZE	20,	19
-	bsr.w	MakeMap
+	bsr.w	MakeMapInit
 
 ;	move.l	#CRAMWRITE,(VDPCTRL)	;	making sure were not looping
 ;	move.w	#$E0,VDPDATA
@@ -32,12 +32,12 @@
 .l
 	sub.b	#1,	SCREENX
 	lea		mapset,	a1
-	bsr.w	MakeMap
+	bsr.w	MakeColumn
 	bra.s	.loop
 .r
 	add.b	#1,	SCREENX
 	lea		mapset,	a1
-	bsr.w	MakeMap
+	bsr.w	MakeColumn
 	bra.s	.loop
 .u
 ;	sub.b	#1,	SCREENY
@@ -53,11 +53,16 @@
 	
 ;	== PRINT MAP (SUB) =--===========================
 
-LIMITX	=	3-1	;	12
-LIMITY	=	8-1		;	8
+;LIMITX	=	12-1	;	12
+;LIMITY	=	8-1		;	8
 
-MakeMap:
+MakeMapInit:
+	MAPLIMIT	10, 7
+	WRITEVRAM	PLANE_A,d3		;	reference raw VRAM pointer
+	bra.s	MakeMap
 
+MakeColumn:
+	MAPLIMIT	1, 7
 	WRITEVRAM	PLANE_A,d3		;	reference raw VRAM pointer
 	moveq	#0,			d0
 	move.b	SCREENX,	d0
@@ -67,7 +72,11 @@ MakeMap:
 	lsl.l	#3,			d0	;	at:   20000
 	add.l	d0,			d3	;	add X offset to writer
 	moveq	#0,			d0
-	
+	bra.s	MakeMap
+
+	nop		;	temp
+MakeMap:
+	move.l	d5,		d6		;	backup limiter
 	moveq	#0,			d0
 	moveq	#0,			d1
 	move.b	SCREENX,	d0
@@ -83,7 +92,7 @@ MakeMap:
 	
 	move.b	MAPSIZE+1,	d4	;	YMODE: Y length
 	swap	d4				;	storing both in same register
-	move.l	#(LIMITY*$10000)+LIMITX,	d5	;	Limiter so screen doesnt draw over itself when map's too big (8 down, 16 across)
+;	move.l	#(LIMITY*$10000)+LIMITX,	d5	;	Limiter so screen doesnt draw over itself when map's too big (8 down, 16 across)
 	
 .loopX2
 	move.b	MAPSIZE,	d4	;	XMODE: X length
@@ -100,7 +109,7 @@ MakeMap:
 	bra.s	.loopX
 	
 .tstY
-	move.b	#LIMITX,	d5	;	X Limiter
+	move.b	d6,		d5	;	X Limiter
 	swap	d5			;	YLIMIT
 	sub.b	#1,		d5
 	tst.b	d5

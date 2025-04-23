@@ -18,3 +18,8 @@ WRITEVRAM	MACRO	LOC,	DEST
 MAPSIZE		MACRO	X,	Y
 		move.w	#(X*256)+Y,	MAPSIZE
 		ENDM
+		
+	;	vvv Moves into d5 vvv
+MAPLIMIT	MACRO	X,	Y
+		move.l	#((Y*$10000)+2)+(X-1),	d5
+		ENDM
