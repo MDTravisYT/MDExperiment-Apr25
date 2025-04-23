@@ -32,11 +32,13 @@
 .l
 	sub.b	#1,	SCREENX
 	lea		mapset,	a1
+	move.b	#0,		d1	;	left
 	bsr.w	MakeColumn
 	bra.s	.loop
 .r
 	add.b	#1,	SCREENX
 	lea		mapset,	a1
+	move.b	#1,		d1	;	right
 	bsr.w	MakeColumn
 	bra.s	.loop
 .u
@@ -56,17 +58,20 @@
 ;LIMITX	=	12-1	;	12
 ;LIMITY	=	8-1		;	8
 
-MakeMapInit:
-	MAPLIMIT	10, 7
-	WRITEVRAM	PLANE_A,d3		;	reference raw VRAM pointer
-	bra.s	MakeMap
-
 MakeColumn:
 	MAPLIMIT	1, 7
 	WRITEVRAM	PLANE_A,d3		;	reference raw VRAM pointer
 	moveq	#0,			d0
 	move.b	SCREENX,	d0
-	and.b	#%00001111,		d0	;	wrap shift prevention
+	tst.b	d1
+	beq.s	.left
+	add.b	#10,		d0		;offset for left
+	add.w	#10,		a1		;offset for left
+	bra.s	.cont
+.left
+	sub.b	#16,		d0		;offset for left
+.cont
+	and.b	#%00001111,	d0	;	wrap shift prevention
 	lsl.l	#8,			d0	;	goal: 20000, at 80
 	lsl.l	#8,			d0	;	goal: 20000, at 8000
 	lsl.l	#3,			d0	;	at:   20000
@@ -74,7 +79,10 @@ MakeColumn:
 	moveq	#0,			d0
 	bra.s	MakeMap
 
-	nop		;	temp
+MakeMapInit:
+	MAPLIMIT	11, 8
+	WRITEVRAM	PLANE_A,d3		;	reference raw VRAM pointer
+	
 MakeMap:
 	move.l	d5,		d6		;	backup limiter
 	moveq	#0,			d0
