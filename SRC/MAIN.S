@@ -59,14 +59,21 @@
 ;LIMITY	=	8-1		;	8
 
 MakeColumn:
+	moveq	#0,			d0
+	WRITEVRAM	$FC00, VDPCTRL		;	scroll
+	move.b	SCREENX,	d0
+	neg.w	d0
+	lsl.w	#5,			d0
+	move.w	d0,	VDPDATA		;	scroll screen
+
 	MAPLIMIT	1, 7
 	WRITEVRAM	PLANE_A,d3		;	reference raw VRAM pointer
 	moveq	#0,			d0
 	move.b	SCREENX,	d0
 	tst.b	d1
 	beq.s	.left
-	add.b	#10,		d0		;offset for left
-	add.w	#10,		a1		;offset for left
+	add.b	#10,		d0		;offset for right
+	add.w	#10,		a1		;offset for right
 	bra.s	.cont
 .left
 	sub.b	#16,		d0		;offset for left
