@@ -17,13 +17,6 @@
 ;	move.w	#$E0,VDPDATA
 
 .loop:
-	moveq	#0,			d0
-	WRITEVRAM	$FC00, VDPCTRL		;	scroll
-	move.b	SCREENX,	d0
-	neg.w	d0
-	lsl.w	#5,			d0
-	move.w	d0,	VDPDATA		;	scroll screen
-	
 	jsr		VSync
 	lea		mapset,	a1
 	btst	#bitL,	JOYPADPRESS
