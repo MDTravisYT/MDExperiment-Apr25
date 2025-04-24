@@ -11,7 +11,7 @@
 
 	lea		mapset,	a1
 	MAPSIZE	20,	19
-;	bsr.w	MakeMapInit
+	bsr.w	MakeMapInit
 
 ;	move.l	#CRAMWRITE,(VDPCTRL)	;	making sure were not looping
 ;	move.w	#$E0,VDPDATA
@@ -169,11 +169,11 @@ MakeMap:
 	sub.b		#1,	d5	;	X Limiter
 .cont
 	tst.b	d7					;	test for row mode
-	beq.s	.skipYreset
+	beq.s	.skipXreset
 	btst	#$17,		d3		;	make sure we don't fall out of bounds
-	beq.s	.skipYreset
+	beq.s	.skipXreset
 	sub.l	#$800000,	d3
-.skipYreset
+.skipXreset
 	tst.b	d4				;	check if X length is used up
 	beq.s	.tstY
 	bsr.s	MakeChunk
@@ -196,6 +196,10 @@ MakeMap:
 	
 .loopY
 	add.l	#$2000000,	d3		;	move drawer to next position
+	btst	#$1C,		d3		;	make sure we don't fall out of bounds
+	beq.s	.skipYreset
+	sub.l	#$10000000,	d3
+.skipYreset
 	sub.b	#1,	d4	;	YMODE
 	swap	d4		;	XMODE
 	move.b	MAPSIZE,	d4	;	XMODE: X length
