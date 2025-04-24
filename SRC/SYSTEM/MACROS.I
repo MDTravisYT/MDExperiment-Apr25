@@ -19,8 +19,10 @@ WRITEVSRAM	MACRO
 		MOVE.L	#VSRAMWRITE,	VDPCTRL
 		ENDM
 		
-MAPSIZE		MACRO	X,	Y
-		move.w	#(X*256)+Y,	MAPSIZE
+MAPDEF	MACRO	LOC,	X,	Y
+		dc.l	LOC
+		dc.w	(X*256)+Y
+		dc.w	0	;	dummy to make math easier for 2:30 AM mind
 		ENDM
 		
 	;	vvv Moves into d5 vvv

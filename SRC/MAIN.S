@@ -9,8 +9,7 @@
 	
 ;	== MAIN LOOP ====================================
 
-	lea		mapset,	a1
-	MAPSIZE	20,	19
+	move.b	#0,	MAP
 	bsr.w	MakeMapInit
 
 ;	move.l	#CRAMWRITE,(VDPCTRL)	;	making sure were not looping
@@ -18,7 +17,7 @@
 
 .loop:
 	jsr		VSync
-	lea		mapset,	a1
+;	lea		mapset,	a1
 	btst	#bitL,	JOYPADPRESS
 	bne.s	.l
 	btst	#bitR,	JOYPADPRESS
@@ -27,7 +26,15 @@
 	bne.w	.u
 	btst	#bitDn,	JOYPADPRESS
 	bne.w	.d
+	btst	#bitStart,	JOYPADPRESS
+	bne.w	.nextmap
 	
+	bra.s	.loop
+	
+.nextmap
+	add.b	#1,	MAP
+	move.w	#0,	SCREENX	;	does both X and Y size, since theyre bytes
+	bsr.w	MakeMapInit
 	bra.s	.loop
 
 .l
@@ -85,10 +92,24 @@
 	move.b	d1,		SCREENY
 	bra.w	.loop
 
+
 	
+;	== INIT MAP (SUB) =--===========================
+InitMap:
+	moveq	#0,		d0
+	move.b	MAP,	d0
+	lea		maptbl,	a0
+	lsl.w	#3,		d0
+	add.w	d0,		a0
+	move.l	(a0)+,	a1	;	map data
+	move.w	(a0)+,	MAPSIZE	;	map dimensions
+	
+	rts
+
 ;	== PRINT MAP (SUB) =--===========================
 
 MakeColumn:
+	bsr.w	InitMap
 	moveq	#0,			d0
 	WRITEVRAM	$FC00, VDPCTRL		;	scroll
 	move.b	SCREENX,	d0
@@ -158,6 +179,7 @@ MakeRow:
 	bra.s	MakeMap
 
 MakeMapInit:
+	bsr.w	InitMap
 	MAPLIMIT	11, 8
 	WRITEVRAM	PLANE_A,d3		;	reference raw VRAM pointer
 	
@@ -259,6 +281,10 @@ MakeChunk:
 	rts
 
 ;	== INCLUDES =====================================
+maptbl:
+	MAPDEF	MAP001,	20,	19
+	MAPDEF	MAP002,	10,	18
+	MAPDEF	MAP003,	10,	9
 	
 	include		"SRC/SYSTEM/JOYPAD.S"
 	include		"SRC/SYSTEM/VSYNC.S"
@@ -272,6 +298,12 @@ pal:
 blkset:
 	incbin		"src/overworld.bst"
 	even
-mapset:
+MAP001:
 	incbin		"src/ViridianCity.blk"
+	even
+MAP002:
+	incbin		"src/Route1.blk"
+	even
+MAP003:
+	incbin		"src/PalletTown.blk"
 	even
