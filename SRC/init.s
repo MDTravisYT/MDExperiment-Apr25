@@ -41,6 +41,6 @@ init:
 	move.l	(a0)+,(a1)
 	dbf		d0,	.loadPal
 	
-	move.l	#$05,-(sp)
-	jsr	_gemsstartsong		; start song
-	adda.w	#4,sp
+;	move.l	#$05,-(sp)
+;	jsr	_gemsstartsong		; start song
+;	adda.w	#4,sp

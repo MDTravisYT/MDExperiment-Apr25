@@ -11,12 +11,19 @@
 
 	lea		mapset,	a1
 	MAPSIZE	20,	19
-;	bsr.w	MakeMapInit
+	bsr.w	MakeMapInit
 
 ;	move.l	#CRAMWRITE,(VDPCTRL)	;	making sure were not looping
 ;	move.w	#$E0,VDPDATA
 
 .loop:
+	moveq	#0,			d0
+	WRITEVRAM	$FC00, VDPCTRL		;	scroll
+	move.b	SCREENX,	d0
+	neg.w	d0
+	lsl.w	#5,			d0
+	move.w	d0,	VDPDATA		;	scroll screen
+	
 	jsr		VSync
 	btst	#bitL,	JOYPADPRESS
 	bne.s	.l
@@ -33,24 +40,28 @@
 	sub.b	#1,	SCREENX
 	lea		mapset,	a1
 	move.b	#0,		d1	;	left
+	moveq	#0,		d7	;	clear row mode
 	bsr.w	MakeColumn
 	bra.s	.loop
 .r
 	add.b	#1,	SCREENX
 	lea		mapset,	a1
 	move.b	#1,		d1	;	right
+	moveq	#0,		d7	;	clear row mode
 	bsr.w	MakeColumn
 	bra.s	.loop
 .u
 	sub.b	#1,	SCREENY
 	lea		mapset,	a1
 	move.b	#2,		d1	;	up
+	moveq	#1,		d7	;	set row mode
 	bsr.w	MakeColumn
 	bra.w	.loop
 .d
 	add.b	#1,	SCREENY
 	lea		mapset,	a1
 	move.b	#3,		d1	;	down
+	moveq	#1,		d7	;	set row mode
 	bsr.w	MakeColumn
 	bra.w	.loop
 
@@ -69,8 +80,8 @@ MakeColumn:
 	WRITEVRAM	PLANE_A,d3		;	reference raw VRAM pointer
 	moveq	#0,			d0
 	move.b	SCREENX,	d0
-	cmpi.b	#2,			d1	;	skip if row
-	bge.s	.cont
+	tst.b	d7					;	skip if row
+	bne.s	.cont
 	tst.b	d1
 	beq.s	.left
 	add.b	#10,		d0		;offset for right
@@ -85,13 +96,35 @@ MakeColumn:
 	lsl.l	#3,			d0	;	at:   20000
 	add.l	d0,			d3	;	add X offset to writer
 	moveq	#0,			d0
-	cmpi.b	#2,			d1	;	go to row creation if 2 or 3
-	bge.s	MakeRow
+	tst.b	d7				;	go to row creation if row mode
+	bne.s	MakeRow
 	bra.s	MakeMap
 
 MakeRow:
+	moveq	#0,			d0
+	WRITEVSRAM		;	scroll
+	move.b	SCREENY,	d0
+	lsl.w	#5,			d0
+	move.w	d0,	VDPDATA		;	scroll screen
+	
 	MAPLIMIT	11, 1
 	move.b	SCREENY,	d0
+	
+	moveq	#0,			d2
+	move.b	MAPSIZE,	d2
+	mulu.w	#7,			d2
+	
+	cmpi.b	#2,			d1
+	beq.s	.up
+	add.w	d2,			a1	;	down
+	sub.b	#1,			d0
+	bra.s	.cont
+.up
+;	sub.w	MAPSIZE,	a1	;	up
+;	add.b	#1,			d0
+	nop
+	
+.cont
 	moveq	#0,			d2
 	move.b	MAPSIZE+1,	d2
 	and.w	#%00000111,	d2	;	wrap leak prevention
@@ -138,6 +171,12 @@ MakeMap:
 	beq.s	.cont
 	sub.b		#1,	d5	;	X Limiter
 .cont
+	tst.b	d7					;	test for row mode
+	beq.s	.skipYreset
+	btst	#$17,		d3		;	make sure we don't fall out of bounds
+	beq.s	.skipYreset
+	sub.l	#$800000,	d3
+.skipYreset
 	tst.b	d4				;	check if X length is used up
 	beq.s	.tstY
 	bsr.s	MakeChunk
@@ -159,7 +198,7 @@ MakeMap:
 	rts
 	
 .loopY
-	add.l	#$2000000,d3		;	move drawer to next position
+	add.l	#$2000000,	d3		;	move drawer to next position
 	sub.b	#1,	d4	;	YMODE
 	swap	d4		;	XMODE
 	move.b	MAPSIZE,	d4	;	XMODE: X length
