@@ -11,7 +11,7 @@
 
 	lea		mapset,	a1
 	MAPSIZE	20,	19
-	bsr.w	MakeMapInit
+;	bsr.w	MakeMapInit
 
 ;	move.l	#CRAMWRITE,(VDPCTRL)	;	making sure were not looping
 ;	move.w	#$E0,VDPDATA
@@ -78,6 +78,33 @@ MakeColumn:
 
 	MAPLIMIT	1, 8
 	WRITEVRAM	PLANE_A,d3		;	reference raw VRAM pointer
+	
+	move.b	SCREENY,	d0
+	
+	moveq	#0,			d2
+	move.b	MAPSIZE,	d2
+	mulu.w	#7,			d2
+	
+	cmpi.b	#3,			d1
+	bne.s	.cont2
+	add.w	d2,			a1	;	down
+	sub.b	#1,			d0
+	
+.cont2
+	moveq	#0,			d2
+	move.b	MAPSIZE+1,	d2
+	and.w	#%00000111,	d2	;	wrap leak prevention
+	add.w	#1,			d2
+	mulu.w	d2,			d0
+	lsl.l	#8,			d0	;	goal: 800000, at 100
+	lsl.l	#8,			d0	;	goal: 800000, at 10000
+	lsl.l	#7,			d0	;	goal: 800000, at 800000
+	add.l	d0,			d3	;	add X offset to writer
+	cmpi.l	#$50000000,	d3	;	make sure we don't fall out of bounds
+	blo.s	.skipYreset
+	and.l	#%11101111111111111111111111111111,d3
+.skipYreset
+	
 	moveq	#0,			d0
 	move.b	SCREENX,	d0
 	tst.b	d7					;	skip if row
@@ -96,6 +123,7 @@ MakeColumn:
 	lsl.l	#3,			d0	;	at:   20000
 	add.l	d0,			d3	;	add X offset to writer
 	moveq	#0,			d0
+	
 	tst.b	d7				;	go to row creation if row mode
 	bne.s	MakeRow
 	bra.s	MakeMap
@@ -106,38 +134,7 @@ MakeRow:
 	move.b	SCREENY,	d0
 	lsl.w	#5,			d0
 	move.w	d0,	VDPDATA		;	scroll screen
-	
 	MAPLIMIT	11, 1
-	move.b	SCREENY,	d0
-	
-	moveq	#0,			d2
-	move.b	MAPSIZE,	d2
-	mulu.w	#7,			d2
-	
-	cmpi.b	#2,			d1
-	beq.s	.up
-	add.w	d2,			a1	;	down
-	sub.b	#1,			d0
-	bra.s	.cont
-.up
-;	sub.w	MAPSIZE,	a1	;	up
-;	add.b	#1,			d0
-	nop
-	
-.cont
-	moveq	#0,			d2
-	move.b	MAPSIZE+1,	d2
-	and.w	#%00000111,	d2	;	wrap leak prevention
-	add.w	#1,			d2
-	mulu.w	d2,			d0
-	lsl.l	#8,			d0	;	goal: 800000, at 100
-	lsl.l	#8,			d0	;	goal: 800000, at 10000
-	lsl.l	#7,			d0	;	goal: 800000, at 800000
-	add.l	d0,			d3	;	add X offset to writer
-	cmpi.l	#$50000000,	d3	;	make sure we don't fall out of bounds
-	blo.s	.skipYreset
-	and.l	#%11101111111111111111111111111111,d3
-.skipYreset
 	bra.s	MakeMap
 
 MakeMapInit:
