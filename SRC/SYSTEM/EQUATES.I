@@ -50,7 +50,7 @@ bitUp:		equ 0
 MAPSIZE			rs.w	1
 SCREENX			rs.b	1
 SCREENY			rs.b	1
+MAP				rs.b	1
 JOYPAD			rs.b	1
 JOYPADPRESS		rs.b	1
-MAP				rs.b	1
 VSWAIT			rs.b	1

@@ -19,9 +19,9 @@
 	jsr		VSync
 ;	lea		mapset,	a1
 	btst	#bitL,	JOYPADPRESS
-	bne.s	.l
+	bne.w	.l
 	btst	#bitR,	JOYPADPRESS
-	bne.s	.r
+	bne.w	.r
 	btst	#bitUp,	JOYPADPRESS
 	bne.w	.u
 	btst	#bitDn,	JOYPADPRESS
@@ -34,6 +34,10 @@
 .nextmap
 	add.b	#1,	MAP
 	move.w	#0,	SCREENX	;	does both X and Y size, since theyre bytes
+	WRITEVRAM	$FC00,	VDPCTRL		;	scroll
+	move.w		#0,		VDPDATA
+	WRITEVSRAM
+	move.w		#0,		VDPDATA
 	bsr.w	MakeMapInit
 	bra.s	.loop
 
