@@ -25,44 +25,71 @@
 	move.w	d0,	VDPDATA		;	scroll screen
 	
 	jsr		VSync
+	lea		mapset,	a1
 	btst	#bitL,	JOYPADPRESS
 	bne.s	.l
 	btst	#bitR,	JOYPADPRESS
 	bne.s	.r
 	btst	#bitUp,	JOYPADPRESS
-	bne.s	.u
+	bne.w	.u
 	btst	#bitDn,	JOYPADPRESS
-	bne.s	.d
+	bne.w	.d
 	
 	bra.s	.loop
 
 .l
 	sub.b	#1,	SCREENX
-	lea		mapset,	a1
+	move.b	SCREENX,	d0
+	move.b	MAPSIZE,	d1
+	cmp.b	d0,			d1
+	blo.s	.resetL
 	move.b	#0,		d1	;	left
 	moveq	#0,		d7	;	clear row mode
 	bsr.w	MakeColumn
-	bra.s	.loop
+	bra.w	.loop
+.resetL
+	move.b	#0,	SCREENX
+	bra.w	.loop
 .r
 	add.b	#1,	SCREENX
-	lea		mapset,	a1
+	move.b	SCREENX,	d0
+	move.b	MAPSIZE,	d1
+	sub.b	#10,		d1
+	cmp.b	d0,			d1
+	blo.s	.resetR
 	move.b	#1,		d1	;	right
 	moveq	#0,		d7	;	clear row mode
 	bsr.w	MakeColumn
-	bra.s	.loop
+	bra.w	.loop
+.resetR
+	move.b	d1,		SCREENX
+	bra.w	.loop
 .u
 	sub.b	#1,	SCREENY
-	lea		mapset,	a1
+	move.b	SCREENY,	d0
+	move.b	MAPSIZE+1,	d1
+	cmp.b	d0,			d1
+	blo.s	.resetU
 	move.b	#2,		d1	;	up
 	moveq	#1,		d7	;	set row mode
 	bsr.w	MakeColumn
 	bra.w	.loop
+.resetU
+	move.b	#0,	SCREENY
+	bra.w	.loop
 .d
 	add.b	#1,	SCREENY
-	lea		mapset,	a1
+	move.b	SCREENY,	d0
+	move.b	MAPSIZE,	d1
+	sub.b	#9,		d1
+	cmp.b	d0,			d1
+	blo.s	.resetD
 	move.b	#3,		d1	;	down
 	moveq	#1,		d7	;	set row mode
 	bsr.w	MakeColumn
+	bra.w	.loop
+.resetD
+	move.b	d1,		SCREENY
 	bra.w	.loop
 
 	
