@@ -84,8 +84,8 @@
 .d
 	add.b	#1,	SCREENY
 	move.b	SCREENY,	d0
-	move.b	MAPSIZE,	d1
-	sub.b	#9,		d1
+	move.b	MAPSIZE+1,	d1
+	sub.b	#8,		d1
 	cmp.b	d0,			d1
 	blo.s	.resetD
 	move.b	#3,		d1	;	down
@@ -276,7 +276,6 @@ MakeChunk:
 	tst.b		d5				;	limiter
 	beq.s		.noDraw			;	don't draw if limit reached
 	move.w		d0,	VDPDATA
-;	jsr		VSync	;	TEMP
 .noDraw
 	dbf			d1,	.loop1		;	horizontal loop
 	add.l		#$800000,d3		;	move drawer down one
@@ -287,27 +286,38 @@ MakeChunk:
 ;	== INCLUDES =====================================
 maptbl:
 	MAPDEF	MAP001,	20,	19
-	MAPDEF	MAP002,	10,	18
+	MAPDEF	MAP002,	10,	36
 	MAPDEF	MAP003,	10,	9
+	MAPDEF	MAP004,	20,	19
+	MAPDEF	MAP005,	30,	9
 	
 	include		"SRC/SYSTEM/JOYPAD.S"
 	include		"SRC/SYSTEM/VSYNC.S"
 	
 art:
-	incbin		"art/art.unc"
+	incbin		"art/overworld.bin"
 	art_end:	even
 pal:
-	incbin		"art/pal.pal"
+	dc.w		$000
+	dc.w		$444
+	dc.w		$AAA
+	dc.w		$EEE
 	pal_end:	even
 blkset:
-	incbin		"src/overworld.bst"
+	incbin		"blocks/overworld.bst"
 	even
 MAP001:
-	incbin		"src/ViridianCity.blk"
+	incbin		"maps/ViridianCity.blk"
 	even
 MAP002:
-	incbin		"src/Route1.blk"
+	incbin		"maps/Route1.blk"
 	even
 MAP003:
-	incbin		"src/PalletTown.blk"
+	incbin		"maps/PalletTown.blk"
+	even
+MAP004:
+	incbin		"maps/SaffronCity.blk"
+	even
+MAP005:
+	incbin		"maps/Route13.blk"
 	even

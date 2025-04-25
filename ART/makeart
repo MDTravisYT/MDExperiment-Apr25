@@ -1,0 +1,57 @@
+input  forest.png
+output forest.bin
+tiles 0 0 16 6
+input  overworld.png
+output overworld.bin
+tiles 0 0 16 6
+input  pokecenter.png
+output pokecenter.bin
+tiles 0 0 16 6
+input  house.png
+output house.bin
+tiles 0 0 16 6
+input  gym.png
+output gym.bin
+tiles 0 0 16 6
+input  interior.png
+output interior.bin
+tiles 0 0 16 6
+input  ship_port.png
+output ship_port.bin
+tiles 0 0 16 6
+input  gate.png
+output gate.bin
+tiles 0 0 16 6
+input  facility.png
+output facility.bin
+tiles 0 0 16 6
+input  lab.png
+output lab.bin
+tiles 0 0 16 6
+input  cavern.png
+output cavern.bin
+tiles 0 0 16 5
+input  plateau.png
+output plateau.bin
+tiles 0 0 16 5
+input  lobby.png
+output lobby.bin
+tiles 0 0 16 6
+input  mansion.png
+output mansion.bin
+tiles 0 0 16 6
+input  cemetery.png
+output cemetery.bin
+tiles 0 0 16 6
+input  club.png
+output club.bin
+tiles 0 0 16 5
+input  ship.png
+output ship.bin
+tiles 0 0 16 6
+input  reds_house.png
+output reds_house.bin
+tiles 0 0 16 5
+input  underground.png
+output underground.bin
+tiles 0 0 16 2
