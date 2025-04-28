@@ -58,7 +58,7 @@
 	add.b	#1,	SCREENX
 	move.b	SCREENX,	d0
 	move.b	MAPSIZE,	d1
-	sub.b	#10,		d1
+	sub.b	#8,		d1
 	cmp.b	d0,			d1
 	blo.s	.resetR
 	move.b	#1,		d1	;	right
@@ -178,6 +178,7 @@ MakeRow:
 	WRITEVSRAM		;	scroll
 	move.b	SCREENY,	d0
 	lsl.w	#5,			d0
+	add.b	#8,			d0
 	move.w	d0,	VDPDATA		;	scroll screen
 	MAPLIMIT	11, 1
 	bra.s	MakeMap

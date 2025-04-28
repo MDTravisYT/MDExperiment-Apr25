@@ -11,7 +11,7 @@ init:
 	move.w	#$8900+%00000000,(VDPCTRL)      ;	MASTER SYSTEM V-SCROLL
 	move.w	#$8A00+%00000000,(VDPCTRL)      ;	H-INT COUNTER
 	move.w	#$8B00+%00000000,(VDPCTRL)      ;	MODE REGISTER 3
-	move.w	#$8C00+%10000001,(VDPCTRL)      ;	MODE REGISTER 4
+	move.w	#$8C00+%00000000,(VDPCTRL)      ;	MODE REGISTER 4
 	move.w	#$8D00+%00111111,(VDPCTRL)      ;	H-SCROLL DATA LOCATION
 	move.w	#$8E00+%00000000,(VDPCTRL)      ;	
 	move.w	#$8F00+%00000010,(VDPCTRL)      ;	AUTO-INCREMENT VALUE
@@ -40,6 +40,9 @@ init:
 .loadPal
 	move.l	(a0)+,(a1)
 	dbf		d0,	.loadPal
+
+	WRITEVSRAM		;	scroll
+	move.w	#8,	VDPDATA		;	scroll screen
 	
 ;	move.l	#$05,-(sp)
 ;	jsr	_gemsstartsong		; start song
