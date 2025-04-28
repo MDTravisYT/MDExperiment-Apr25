@@ -30,7 +30,7 @@ init:
 	move.l	(a0)+,(a1)
 	dbf		d0,	.loadArt
 	
-	jsr		_sfxinit	;	init GEMS
+	jsr		INITSOUND	;	init sound
 	jsr		INITJOYPADS	;	init controller
 	move	#$2300,sr
 	
@@ -40,10 +40,8 @@ init:
 .loadPal
 	move.l	(a0)+,(a1)
 	dbf		d0,	.loadPal
+	
+;	move.b	#$81,	sound_ram+buf1
 
 	WRITEVSRAM		;	scroll
 	move.w	#8,	VDPDATA		;	scroll screen
-	
-;	move.l	#$05,-(sp)
-;	jsr	_gemsstartsong		; start song
-;	adda.w	#4,sp

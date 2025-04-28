@@ -1,9 +1,11 @@
 	include		"src/system/macros.i"
 	include		"src/system/equates.i"
+	include		"sound/src/tb.lib"
+	include		"sound/src/eq.lib"
+	include		"sound/src/mcr.lib"
 	include		"src/system/vectors.s"
 	include		"src/system/error.s"
 	include		"src/system/interrupt.s"
-	include		"GEMS/sound.s"
 	
 	include		"src/init.s"
 	
@@ -95,8 +97,6 @@
 .resetD
 	move.b	d1,		SCREENY
 	bra.w	.loop
-
-
 	
 ;	== INIT MAP (SUB) =--===========================
 InitMap:
@@ -322,3 +322,5 @@ MAP004:
 MAP005:
 	incbin		"maps/Route13.blk"
 	even
+	
+	include		"sound/sound.s"
