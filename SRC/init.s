@@ -22,14 +22,6 @@ init:
 	move.l	#CRAMWRITE,(VDPCTRL)
 	move.w	#$E0,VDPDATA
 	
-	lea		art,	a0
-	lea		VDPDATA,a1
-	move.l	#(art_end-art)/4-1,	d0
-	move.l	#VRAMWRITE,(VDPCTRL)
-.loadArt
-	move.l	(a0)+,(a1)
-	dbf		d0,	.loadArt
-	
 ;INITSOUND
 	z80reset_off
 	z80bus_on
@@ -46,19 +38,25 @@ init:
 	dbf		d0,		.stall
 	z80reset_on
 	z80bus_off
-
-	
 	jsr		INITJOYPADS	;	init controller
 	move	#$2300,sr
 	
+	move.b	#$81,	sound_ram+buf1
+
+	WRITEVSRAM		;	scroll
+	move.w	#8,	VDPDATA		;	scroll screen
+	
+	lea		art,	a0
+	lea		VDPDATA,a1
+	move.l	#(art_end-art)/4-1,	d0
+	move.l	#VRAMWRITE,(VDPCTRL)
+.loadArt
+	move.l	(a0)+,(a1)
+	dbf		d0,	.loadArt
+
 	move.l	#CRAMWRITE,(VDPCTRL)
 	lea		pal,	a0
 	move.l	#(pal_end-pal)/4-1,	d0
 .loadPal
 	move.l	(a0)+,(a1)
 	dbf		d0,	.loadPal
-	
-	move.b	#$81,	sound_ram+buf1
-
-	WRITEVSRAM		;	scroll
-	move.w	#8,	VDPDATA		;	scroll screen
