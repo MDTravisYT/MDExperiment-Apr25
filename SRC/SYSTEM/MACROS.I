@@ -29,3 +29,14 @@ MAPDEF	MACRO	LOC,	X,	Y
 MAPLIMIT	MACRO	X,	Y
 		move.l	#((Y*$10000)+2)+(X-1),	d5
 		ENDM
+		
+ARTLIST		MACRO	LOC,	LOC_END,	DEST
+		dc.w	((LOC_END-LOC)/4)-1
+		dc.l	VRAMWRITE+((DEST&$3FFF)<<16)+((DEST&$C000)>>14)
+		dc.l	LOC
+		ENDM
+		
+ARTLIST_END	MACRO
+		dc.l	-1
+		even
+		ENDM

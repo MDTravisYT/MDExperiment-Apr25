@@ -46,17 +46,12 @@ init:
 	WRITEVSRAM		;	scroll
 	move.w	#8,	VDPDATA		;	scroll screen
 	
-	lea		art,	a0
-	lea		VDPDATA,a1
-	move.l	#(art_end-art)/4-1,	d0
-	move.l	#VRAMWRITE,(VDPCTRL)
-.loadArt
-	move.l	(a0)+,(a1)
-	dbf		d0,	.loadArt
+	move.b	#0,	d0
+	bsr.w	LoadArtList
 
 	move.l	#CRAMWRITE,(VDPCTRL)
 	lea		pal,	a0
 	move.l	#(pal_end-pal)/4-1,	d0
 .loadPal
-	move.l	(a0)+,(a1)
+	move.l	(a0)+,VDPDATA
 	dbf		d0,	.loadPal

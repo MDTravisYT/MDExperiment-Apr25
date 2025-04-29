@@ -294,13 +294,17 @@ maptbl:
 	
 	include		"SRC/SYSTEM/JOYPAD.S"
 	include		"SRC/SYSTEM/VSYNC.S"
+	include		"SRC/SUB/LOADART.S"
 	
 art:
 	incbin		"art/overworld.bin"
 	art_end:	even
+redart:
+	incbin		"art/red.bin"
+	redart_end:	even
 pal:
 	dc.w		$000
-	dc.w		$444
+	dc.w		$666
 	dc.w		$AAA
 	dc.w		$EEE
 	pal_end:	even
@@ -323,5 +327,5 @@ MAP005:
 	incbin		"maps/Route13.blk"
 	even
 	
-	org			sound_top
+	align		$1000
 	include		"sound/sound.s"

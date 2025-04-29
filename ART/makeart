@@ -55,3 +55,7 @@ tiles 0 0 16 5
 input  underground.png
 output underground.bin
 tiles 0 0 16 2
+input  red.png
+output red.bin
+layout sprite
+tiles 0 0 12 2

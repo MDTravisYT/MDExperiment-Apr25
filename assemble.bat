@@ -9,6 +9,7 @@ if not exist OUT mkdir OUT
 type _errors.log
 del _errors.log
 
+echo.
 echo Building art...
 echo ========================================================================================================================
 cd ../../ART

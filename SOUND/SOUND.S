@@ -1,3 +1,4 @@
+sound_top:
 	include		"sound/data/tb.asm"
 	include		"sound/data/sng81.s"
 	include		"sound/data/sng82.s"
