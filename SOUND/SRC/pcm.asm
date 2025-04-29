@@ -13,7 +13,7 @@
 ;			  INCLUDE FILE				;
 ;=======================================;
 pcm_top	equ		*
-		include	"sound\pcm\mddr11.hhh"
+		incbin	"sound\pcm\out\mddr11.bin"
 pcm_end	equ		*
 
 ; vim: set ft=asm68k sw=4 ts=4 noet:
