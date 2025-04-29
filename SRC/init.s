@@ -22,7 +22,7 @@ init:
 	move.l	#CRAMWRITE,(VDPCTRL)
 	move.w	#$E0,VDPDATA
 	
-;INITSOUND
+;	init sound
 	z80reset_off
 	z80bus_on
 	z80reset_on
@@ -55,3 +55,10 @@ init:
 .loadPal
 	move.l	(a0)+,VDPDATA
 	dbf		d0,	.loadPal
+	
+;	draw temp sprite
+	WRITEVRAM	$F800
+	move.w	#$80+$64,	VDPDATA	;	Y POS
+	move.w	#%010100000000,	VDPDATA	;	SIZE (2x2)
+	move.w	#$4000/$20,	VDPDATA	;	VRAM
+	move.w	#$80+$70,	VDPDATA	;	X POS
