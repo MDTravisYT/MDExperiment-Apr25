@@ -27,10 +27,10 @@ ArtLists:
 	dc.w	.list2-ArtLists
 	
 .list1:
-	ARTLIST	art,	art_end,	0
-	ARTLIST	redart,	redart_end,	$4000
+	ARTLIST	art,	0
+	ARTLIST	redart,	$4000
 	ARTLIST_END
 	
 .list2:
-	ARTLIST	redart,	redart_end,	0
+	ARTLIST	redart,	0
 	ARTLIST_END
