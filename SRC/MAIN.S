@@ -323,4 +323,5 @@ MAP005:
 	incbin		"maps/Route13.blk"
 	even
 	
+	org			sound_top
 	include		"sound/sound.s"

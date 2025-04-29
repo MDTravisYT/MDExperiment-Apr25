@@ -1,22 +1,3 @@
-INITSOUND:
-	z80reset_off
-	z80bus_on
-	z80reset_on
-	lea		pcm_top,a0
-	lea		Z80RAM,	a1
-	move.w	#(pcm_end-pcm_top)-1,	d0
-.load
-	move.b	(a0)+,	(a1)+
-	dbf		d0,		.load
-	z80reset_off
-	move.w	#$20,	d0
-.stall
-	dbf		d0,		.stall
-	z80reset_on
-	z80bus_off
-	rts
-	
-
 	include		"sound/data/tb.asm"
 	include		"sound/data/sng81.s"
 	include		"sound/data/sng82.s"
